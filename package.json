@@ -1,0 +1,34 @@
+{
+  "name": "rvl-pipe-mongodb",
+  "version": "0.1.0",
+  "description": "rvl-pipe style wrappers for mongodb",
+  "main": "index.js",
+  "scripts": {
+    "test": "ava --verbose",
+    "lint": "standard",
+    "report": "nyc report --reporter=html"
+  },
+  "keywords": [
+    "pipe",
+    "promises",
+    "async",
+    "mongodb"
+  ],
+  "repository": "https://github.com/revelatio/rvl-pipe",
+  "author": "Ernesto Freyre",
+  "license": "MIT",
+  "dependencies": {
+    "bluebird": "^3.5.1",
+    "mongodb": "^3.0.2",
+    "ramda": "^0.25.0",
+    "rvl-pipe": "latest"
+  },
+  "devDependencies": {
+    "ava": "^0.25.0",
+    "cuid": "^2.0.2",
+    "faker": "^4.1.0",
+    "nyc": "^11.4.1",
+    "sinon": "^4.2.2",
+    "standard": "^10.0.3"
+  }
+}
