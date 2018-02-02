@@ -116,6 +116,26 @@ return startWith()
     .then(upsertDocument('contacts', { _id: uidToFind, name, last }, 'contact'))
 ```
 
+## Error recovery, mostly for closing the connection
+
+We usually need to close the connecting at the end of our functions pipeline.
+If we have a `.catch(...)` step we should guarantee that once we process
+the error we return the context so we can add another step at the end of
+the promises chain to close the DB connection.
+
+```javascript
+return startWith()
+    .then(connectMongoDB(process.env.MONGO_URL, process.env.MONGO_DB))
+    .then(upsertDocument('contacts', { _id: uidToFind, name, last }, 'contact'))
+
+    .catch(err => {
+        // We process the error here
+
+        return err.context
+    })
+    .then(closeMongoDB())
+```
+
 ## Creating your own mongodb functions
 
 You can use this approach to create your own mongodb functions. Your function
@@ -123,12 +143,14 @@ signature should look like this:
 
 ```javascript
 const myMongoDBOp = (params) => ctx => {
-    return return ctx.mongodb.db.collection(...).op(...)
+    return ctx.mongodb.db.collection(...).op(...)
         .then(...) // mutates context if necessary
 
         .then(() => ctx) // return context at the end of the chain
         .catch(throwContextError(ctx))  // use throwContextError to wrap the error with the context
 }
 ```
+
+
 
 If you want to see a function included in here let me know by opening an issue.
