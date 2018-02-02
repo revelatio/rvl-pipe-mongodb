@@ -4,7 +4,7 @@
   "description": "rvl-pipe style wrappers for mongodb",
   "main": "index.js",
   "scripts": {
-    "test": "ava --verbose",
+    "test": "nyc ava --verbose",
     "lint": "standard",
     "report": "nyc report --reporter=html"
   },
@@ -14,7 +14,7 @@
     "async",
     "mongodb"
   ],
-  "repository": "https://github.com/revelatio/rvl-pipe",
+  "repository": "https://github.com/revelatio/rvl-pipe-mongodb",
   "author": "Ernesto Freyre",
   "license": "MIT",
   "dependencies": {
