@@ -1,6 +1,6 @@
 const test = require('ava')
 const { startWith } = require('rvl-pipe')
-const { connectMongoDB, closeDB } = require('../../index')
+const { connectMongoDB, closeMongoDB } = require('../../index')
 const { fakeMongo } = require('../helpers/mongo')
 
 test('connects to DB', t => {
@@ -12,8 +12,8 @@ test('connects to DB', t => {
       t.truthy(ctx.mongodb)
       return ctx
     })
-    .then(closeDB())
-    .then(ctx => {
+    .then(closeMongoDB())
+    .then(() => {
       t.is(closeStub.callCount, 1)
       restore()
     })

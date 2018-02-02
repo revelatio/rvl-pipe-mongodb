@@ -1,10 +1,10 @@
-const { connectMongoDB, closeDB } = require('./lib/connection')
+const { connectMongoDB, closeMongoDB } = require('./lib/connection')
 const { runQueryOne, runQuery, runQueryExists } = require('./lib/queries')
 const { createDocument, updateDocumentOne, upsertDocument } = require('./lib/updates')
 
 module.exports = {
   connectMongoDB,
-  closeDB,
+  closeMongoDB,
 
   runQueryOne,
   runQuery,
