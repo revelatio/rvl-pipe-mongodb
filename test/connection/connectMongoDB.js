@@ -32,3 +32,16 @@ test.serial('should not attempt connect if there is already a mongodb object on 
       restore()
     })
 })
+
+test.serial('connects to DB using empty object', t => {
+  const { connectStub, dbStub, restore } = fakeMongo()
+
+  return connectMongoDB('fakeUrl', 'fakeDB')()
+    .then(context => {
+      t.truthy(context.mongodb)
+      t.is(connectStub.args[0][0], 'fakeUrl')
+      t.is(dbStub.args[0][0], 'fakeDB')
+
+      restore()
+    })
+})
