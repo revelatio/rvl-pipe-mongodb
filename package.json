@@ -1,6 +1,6 @@
 {
   "name": "rvl-pipe-mongodb",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "rvl-pipe style wrappers for mongodb",
   "main": "index.js",
   "scripts": {
@@ -18,10 +18,8 @@
   "author": "Ernesto Freyre",
   "license": "MIT",
   "dependencies": {
-    "bluebird": "^3.5.1",
     "mongodb": "^3.0.2",
-    "ramda": "^0.25.0",
-    "rvl-pipe": "latest"
+    "rvl-pipe": "^1.1.0"
   },
   "devDependencies": {
     "ava": "^0.25.0",

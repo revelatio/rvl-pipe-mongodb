@@ -672,7 +672,7 @@ block-stream@*:
   dependencies:
     inherits "~2.0.0"
 
-bluebird@^3.0.0, bluebird@^3.5.1:
+bluebird@^3.0.0:
   version "3.5.1"
   resolved "https://registry.yarnpkg.com/bluebird/-/bluebird-3.5.1.tgz#d9551f9de98f1fcda1e683d17ee91a0602ee2eb9"
 
@@ -3178,10 +3178,6 @@ qs@~6.5.1:
   version "6.5.1"
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.5.1.tgz#349cdf6eef89ec45c12d7d5eb3fc0c870343a6d8"
 
-ramda@^0.25.0:
-  version "0.25.0"
-  resolved "https://registry.yarnpkg.com/ramda/-/ramda-0.25.0.tgz#8fdf68231cffa90bc2f9460390a0cb74a29b29a9"
-
 randomatic@^1.1.3:
   version "1.1.7"
   resolved "https://registry.yarnpkg.com/randomatic/-/randomatic-1.1.7.tgz#c7abe9cc8b87c0baa876b19fde83fd464797e38c"
@@ -3479,12 +3475,9 @@ run-parallel@^1.1.2:
   version "1.1.6"
   resolved "https://registry.yarnpkg.com/run-parallel/-/run-parallel-1.1.6.tgz#29003c9a2163e01e2d2dfc90575f2c6c1d61a039"
 
-rvl-pipe@latest:
-  version "0.4.1"
-  resolved "https://registry.yarnpkg.com/rvl-pipe/-/rvl-pipe-0.4.1.tgz#84815130ee647c1d5434054d2a4107606dfe48d8"
-  dependencies:
-    bluebird "^3.5.1"
-    ramda "^0.25.0"
+rvl-pipe@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/rvl-pipe/-/rvl-pipe-1.1.0.tgz#d19ffb6cb64c8f60a4f1a790fd66a52eaab14b1e"
 
 rx-lite@^3.1.2:
   version "3.1.2"

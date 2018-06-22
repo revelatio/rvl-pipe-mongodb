@@ -1,6 +1,5 @@
 const MongoClient = require('mongodb')
 const sinon = require('sinon')
-const Promise = require('bluebird')
 const cuid = require('cuid')
 const faker = require('faker')
 

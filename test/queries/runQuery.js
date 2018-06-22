@@ -1,15 +1,15 @@
 const test = require('ava')
-const { startWith, prop, props } = require('rvl-pipe')
+const { each, prop, props } = require('rvl-pipe')
 const { connectMongoDB, runQuery } = require('../../index')
 const { fakeMongo, fakeCollections } = require('../helpers/mongo')
 
 test.serial('queries one document with static filter', t => {
   const { restore, collectionStub, findStub } = fakeMongo({ toArray: fakeCollections.contacts })
 
-  return startWith()
-    .then(connectMongoDB('fakeUrl', 'fakeDB'))
-    .then(runQuery('contacts', {}, 'contactList'))
-
+  return each(
+    connectMongoDB('fakeUrl', 'fakeDB'),
+    runQuery('contacts', {}, 'contactList')
+  )()
     .then(context => {
       t.truthy(context.contactList)
       t.deepEqual(context.contactList, fakeCollections.contacts)
@@ -22,10 +22,10 @@ test.serial('queries one document with static filter', t => {
 test.serial('queries one document with dynamic filter', t => {
   const { restore, collectionStub, findStub } = fakeMongo({ toArray: fakeCollections.contacts })
 
-  return startWith({ selectedGroup: 'teamA' })
-    .then(connectMongoDB('fakeUrl', 'fakeDB'))
-    .then(runQuery('contacts', props({ group: prop('selectedGroup') }), 'contactList'))
-
+  return each(
+    connectMongoDB('fakeUrl', 'fakeDB'),
+    runQuery('contacts', props({ group: prop('selectedGroup') }), 'contactList')
+  )({ selectedGroup: 'teamA' })
     .then(context => {
       t.truthy(context.contactList)
       t.deepEqual(context.contactList, fakeCollections.contacts)

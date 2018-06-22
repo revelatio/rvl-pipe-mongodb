@@ -16,8 +16,11 @@ has a simple construct.
 const myAsycTask = (taskParams) => context => {
     // Do async tasks
     // Mutate context, perform side-effects
+    if (someError) {
+        return Promise.reject(error)
+    }
 
-    return context
+    return Promise.resolve(context)
 }
 ```
 
@@ -30,18 +33,33 @@ Only runs once. So you can use the same step several times without actually
 attempting the connection process. It will add a `mongodb` property to the context.
 
 ```javascript
-return startWith()
-    .then(connectMongoDB(process.env.MONGO_URL, process.env.MONGO_DB))
-    .then(should(prop('mongodb'), 'NoMongoDBConnection'))
+return each(
+    connectMongoDB(process.env.MONGO_URL, process.env.MONGO_DB),
+    should(prop('mongodb'), 'NoMongoDBConnection')
+)()
 ```
 
 - `closeMongoDB`: Closes the DB connection that exists on the context.
 
 ```javascript
-return startWith()
-    .then(connectMongoDB(process.env.MONGO_URL, process.env.MONGO_DB))
+return each(
+    connectMongoDB(process.env.MONGO_URL, process.env.MONGO_DB),
     // Do some DB operations
-    .then(closeMongoDB())
+    closeMongoDB()
+)()
+```
+
+To handle connection errors is best to wrap your functions with the `ensure` function from `rvl-pipe`:
+
+```javascript
+return ensure(
+    each(
+        connectMongoDB(process.env.MONGO_URL, process.env.MONGO_DB),
+        // Do some DB operations
+        // ...
+    ),
+    closeMongoDB()
+)()
 ```
 
 ## Queries
@@ -50,19 +68,27 @@ return startWith()
 filter and property name to store value.
 
 ```javascript
-return startWith()
-    .then(connectMongoDB(process.env.MONGO_URL, process.env.MONGO_DB))
-    .then(runQueryOne('contacts', { _id: uidToFind }, 'foundContact'))
-    .then(should(prop('foundContact'), 'ContactNotFound'))
+return ensure(
+    each(
+        connectMongoDB(process.env.MONGO_URL, process.env.MONGO_DB),
+        runQueryOne('contacts', { _id: uidToFind }, 'foundContact'),
+        should(prop('foundContact'), 'ContactNotFound')
+    ),
+    closeMongoDB()
+)()
 ```
 
 You can also use dynamic data for the filter
 
 ```javascript
-return startWith({ contactId: '209889833' })
-    .then(connectMongoDB(process.env.MONGO_URL, process.env.MONGO_DB))
-    .then(runQueryOne('contacts', props({ _id: prop('contactId') }), 'foundContact'))
-    .then(should(prop('foundContact'), 'ContactNotFound'))
+return ensure(
+    each(
+        connectMongoDB(process.env.MONGO_URL, process.env.MONGO_DB),
+        runQueryOne('contacts', props({ _id: prop('contactId') }), 'foundContact'),
+        should(prop('foundContact'), 'ContactNotFound')
+    ),
+    closeMongoDB()
+)({ contactId: '209889833' })
 ```
 
 - `runQuery`: Similar to `runQueryOne` but returning all resulting documents. (This function is not designed to be
@@ -70,20 +96,28 @@ performant in terms of memory consumption since it uses the `toArray()` on the r
 
 
 ```javascript
-return startWith({ owner: '209889833' })
-    .then(connectMongoDB(process.env.MONGO_URL, process.env.MONGO_DB))
-    .then(runQuery('projects', props({ owner: prop('owner') }), 'ownerProjects'))
-    .then(should(prop('ownerProjects'), 'ProjectsNotFound'))
+return ensure(
+    each(
+        connectMongoDB(process.env.MONGO_URL, process.env.MONGO_DB),
+        runQuery('projects', props({ owner: prop('owner') }), 'ownerProjects'),
+        should(prop('ownerProjects'), 'ProjectsNotFound')
+    ),
+    closeMongoDB()
+)({ owner: '209889833' })
 ```
 
 - `runQueryExists`: Exactly as `runQueryOne` but will return **true** | **false**
 if the document exists on the DB
 
 ```javascript
-return startWith()
-    .then(connectMongoDB(process.env.MONGO_URL, process.env.MONGO_DB))
-    .then(runQueryExists('contacts', { _id: uidToFind }, 'foundContact'))
-    .then(should(prop('foundContact'), 'ContactNotFound'))
+return ensure(
+    each(
+        connectMongoDB(process.env.MONGO_URL, process.env.MONGO_DB),
+        runQueryExists('contacts', { _id: uidToFind }, 'foundContact'),
+        should(prop('foundContact'), 'ContactNotFound')
+    ),
+    closeMongoDB()
+)()
 ```
 
 ## Creating and Updating documents
@@ -91,19 +125,27 @@ return startWith()
 - `createDocument`: Creates a simple document passing the collection and the data for it.
 
 ```javascript
-return startWith()
-    .then(connectMongoDB(process.env.MONGO_URL, process.env.MONGO_DB))
-    .then(createDocument('contacts', { _id: cuid(), name: 'John', last: 'Doe' }, 'newContact'))
-    .then(should(prop('newContact'), 'ContactNotCreated'))
+return ensure(
+    each(
+        connectMongoDB(process.env.MONGO_URL, process.env.MONGO_DB),
+        createDocument('contacts', { _id: cuid(), name: 'John', last: 'Doe' }, 'newContact'),
+        should(prop('newContact'), 'ContactNotCreated')
+    ),
+    closeMongoDB()
+)()
 ```
 
 - `updateDocumentOne`: Updates one document passing the collection, the filter to
 find the document we want to change and the mutation object.
 
 ```javascript
-return startWith()
-    .then(connectMongoDB(process.env.MONGO_URL, process.env.MONGO_DB))
-    .then(updateDocumentOne('contacts', { _id: uidToChange }, { $set: { name: 'Mary' } }))
+return ensure(
+    each(
+        connectMongoDB(process.env.MONGO_URL, process.env.MONGO_DB),
+        updateDocumentOne('contacts', { _id: uidToChange }, { $set: { name: 'Mary' } })
+    ),
+    closeMongoDB()
+)()
 ```
 
 - `upsertDocument`: This function will create a step to upsert a document based on its `_id`.
@@ -111,29 +153,13 @@ You can create a new document, `upsertDocument` will try to find if that `_id` a
 exists and update that document, if not, then creates a new one.
 
 ```javascript
-return startWith()
-    .then(connectMongoDB(process.env.MONGO_URL, process.env.MONGO_DB))
-    .then(upsertDocument('contacts', { _id: uidToFind, name, last }, 'contact'))
-```
-
-## Error recovery, mostly for closing the connection
-
-We usually need to close the connecting at the end of our functions pipeline.
-If we have a `.catch(...)` step we should guarantee that once we process
-the error we return the context so we can add another step at the end of
-the promises chain to close the DB connection.
-
-```javascript
-return startWith()
-    .then(connectMongoDB(process.env.MONGO_URL, process.env.MONGO_DB))
-    .then(upsertDocument('contacts', { _id: uidToFind, name, last }, 'contact'))
-
-    .catch(err => {
-        // We process the error here
-
-        return err.context
-    })
-    .then(closeMongoDB())
+return ensure(
+    each(
+        connectMongoDB(process.env.MONGO_URL, process.env.MONGO_DB),
+        upsertDocument('contacts', { _id: uidToFind, name, last }, 'contact')
+    ),
+    closeMongoDB()
+)()
 ```
 
 ## Creating your own mongodb functions
@@ -147,10 +173,7 @@ const myMongoDBOp = (params) => ctx => {
         .then(...) // mutates context if necessary
 
         .then(() => ctx) // return context at the end of the chain
-        .catch(throwContextError(ctx))  // use throwContextError to wrap the error with the context
 }
 ```
-
-
 
 If you want to see a function included in here let me know by opening an issue.

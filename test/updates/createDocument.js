@@ -1,5 +1,5 @@
 const test = require('ava')
-const { startWith, prop, props } = require('rvl-pipe')
+const { each, prop, props } = require('rvl-pipe')
 const { connectMongoDB, createDocument } = require('../../index')
 const { fakeMongo } = require('../helpers/mongo')
 const faker = require('faker')
@@ -11,10 +11,10 @@ test.serial('creates one document with static data', t => {
   const name = faker.name.findName()
   const email = faker.internet.email()
 
-  return startWith()
-    .then(connectMongoDB('fakeUrl', 'fakeDB'))
-    .then(createDocument('contacts', { _id: uid, name, email }, 'newContact'))
-
+  return each(
+    connectMongoDB('fakeUrl', 'fakeDB'),
+    createDocument('contacts', { _id: uid, name, email }, 'newContact')
+  )()
     .then(context => {
       t.truthy(context.newContact)
       t.deepEqual(context.newContact, { _id: uid, name, email })
@@ -30,10 +30,10 @@ test.serial('creates one document with dynamic data', t => {
   const name = faker.name.findName()
   const email = faker.internet.email()
 
-  return startWith({ contact: { name, email } })
-    .then(connectMongoDB('fakeUrl', 'fakeDB'))
-    .then(createDocument('contacts', props({ _id: uid, name: prop('contact.name'), email: prop('contact.email') }), 'newContact'))
-
+  return each(
+    connectMongoDB('fakeUrl', 'fakeDB'),
+    createDocument('contacts', props({ _id: uid, name: prop('contact.name'), email: prop('contact.email') }), 'newContact')
+  )({ contact: { name, email } })
     .then(context => {
       t.truthy(context.newContact)
       t.deepEqual(context.newContact, { _id: uid, name, email })
