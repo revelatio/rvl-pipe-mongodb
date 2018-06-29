@@ -1,5 +1,5 @@
 const test = require('ava')
-const { each, prop, props } = require('rvl-pipe')
+const { each, prop, props, always } = require('rvl-pipe')
 const { connectMongoDB, runQuery } = require('../../index')
 const { fakeMongo, fakeCollections } = require('../helpers/mongo')
 
@@ -8,7 +8,7 @@ test.serial('queries one document with static filter', t => {
 
   return each(
     connectMongoDB('fakeUrl', 'fakeDB'),
-    runQuery('contacts', {}, 'contactList')
+    runQuery('contacts', always({}), 'contactList')
   )()
     .then(context => {
       t.truthy(context.contactList)

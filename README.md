@@ -71,7 +71,7 @@ filter and property name to store value.
 return ensure(
     each(
         connectMongoDB(process.env.MONGO_URL, process.env.MONGO_DB),
-        runQueryOne('contacts', { _id: uidToFind }, 'foundContact'),
+        runQueryOne('contacts', always({ _id: uidToFind }), 'foundContact'),
         should(prop('foundContact'), 'ContactNotFound')
     ),
     closeMongoDB()
@@ -113,7 +113,7 @@ if the document exists on the DB
 return ensure(
     each(
         connectMongoDB(process.env.MONGO_URL, process.env.MONGO_DB),
-        runQueryExists('contacts', { _id: uidToFind }, 'foundContact'),
+        runQueryExists('contacts', always({ _id: uidToFind }), 'foundContact'),
         should(prop('foundContact'), 'ContactNotFound')
     ),
     closeMongoDB()
@@ -128,7 +128,7 @@ return ensure(
 return ensure(
     each(
         connectMongoDB(process.env.MONGO_URL, process.env.MONGO_DB),
-        createDocument('contacts', { _id: cuid(), name: 'John', last: 'Doe' }, 'newContact'),
+        createDocument('contacts', always({ _id: cuid(), name: 'John', last: 'Doe' }), 'newContact'),
         should(prop('newContact'), 'ContactNotCreated')
     ),
     closeMongoDB()
@@ -142,7 +142,7 @@ find the document we want to change and the mutation object.
 return ensure(
     each(
         connectMongoDB(process.env.MONGO_URL, process.env.MONGO_DB),
-        updateDocumentOne('contacts', { _id: uidToChange }, { $set: { name: 'Mary' } })
+        updateDocumentOne('contacts', always({ _id: uidToChange }), always({ $set: { name: 'Mary' } }))
     ),
     closeMongoDB()
 )()
@@ -156,7 +156,7 @@ exists and update that document, if not, then creates a new one.
 return ensure(
     each(
         connectMongoDB(process.env.MONGO_URL, process.env.MONGO_DB),
-        upsertDocument('contacts', { _id: uidToFind, name, last }, 'contact')
+        upsertDocument('contacts', always({ _id: uidToFind, name, last }), 'contact')
     ),
     closeMongoDB()
 )()

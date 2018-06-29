@@ -1,5 +1,5 @@
 const test = require('ava')
-const { each, prop, props } = require('rvl-pipe')
+const { each, prop, props, always } = require('rvl-pipe')
 const { connectMongoDB, upsertDocument } = require('../../index')
 const { fakeMongo } = require('../helpers/mongo')
 const faker = require('faker')
@@ -13,7 +13,7 @@ test.serial('upsert one document with static data', t => {
 
   return each(
     connectMongoDB('fakeUrl', 'fakeDB'),
-    upsertDocument('contacts', { _id: uid, name, email })
+    upsertDocument('contacts', always({ _id: uid, name, email }))
   )()
     .then(() => {
       t.is(collectionStub.args[0][0], 'contacts')

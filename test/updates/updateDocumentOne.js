@@ -1,5 +1,5 @@
 const test = require('ava')
-const { each, prop, props } = require('rvl-pipe')
+const { each, prop, props, always } = require('rvl-pipe')
 const { connectMongoDB, updateDocumentOne } = require('../../index')
 const { fakeMongo } = require('../helpers/mongo')
 const faker = require('faker')
@@ -13,7 +13,7 @@ test.serial('update one document with static filter and data', t => {
 
   return each(
     connectMongoDB('fakeUrl', 'fakeDB'),
-    updateDocumentOne('contacts', { _id: uid }, { $set: { name, email } })
+    updateDocumentOne('contacts', always({ _id: uid }), always({ $set: { name, email } }))
   )()
     .then(() => {
       t.is(collectionStub.args[0][0], 'contacts')

@@ -3475,9 +3475,9 @@ run-parallel@^1.1.2:
   version "1.1.6"
   resolved "https://registry.yarnpkg.com/run-parallel/-/run-parallel-1.1.6.tgz#29003c9a2163e01e2d2dfc90575f2c6c1d61a039"
 
-rvl-pipe@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/rvl-pipe/-/rvl-pipe-1.1.0.tgz#d19ffb6cb64c8f60a4f1a790fd66a52eaab14b1e"
+rvl-pipe@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/rvl-pipe/-/rvl-pipe-1.2.0.tgz#f8ad55490bdc054de3c50c262e8862c353f19967"
 
 rx-lite@^3.1.2:
   version "3.1.2"

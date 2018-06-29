@@ -1,5 +1,5 @@
 const test = require('ava')
-const { each, prop, props } = require('rvl-pipe')
+const { each, prop, props, always } = require('rvl-pipe')
 const { connectMongoDB, createDocument } = require('../../index')
 const { fakeMongo } = require('../helpers/mongo')
 const faker = require('faker')
@@ -13,7 +13,7 @@ test.serial('creates one document with static data', t => {
 
   return each(
     connectMongoDB('fakeUrl', 'fakeDB'),
-    createDocument('contacts', { _id: uid, name, email }, 'newContact')
+    createDocument('contacts', always({ _id: uid, name, email }), 'newContact')
   )()
     .then(context => {
       t.truthy(context.newContact)
