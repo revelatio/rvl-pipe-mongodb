@@ -148,15 +148,15 @@ return ensure(
 )()
 ```
 
-- `upsertDocument`: This function will create a step to upsert a document based on its `_id`.
-You can create a new document, `upsertDocument` will try to find if that `_id` already
+- `upsertDocument`: This function will create a step to upsert a document based on a filter function.
+You can create a new document, `upsertDocument` will try to find if that documento already
 exists and update that document, if not, then creates a new one.
 
 ```javascript
 return ensure(
     each(
         connectMongoDB(process.env.MONGO_URL, process.env.MONGO_DB),
-        upsertDocument('contacts', always({ _id: uidToFind, name, last }), 'contact')
+        upsertDocument('contacts', always({ _id: uidToFind }), always({ _id: uidToFind, name, last }), 'contact')
     ),
     closeMongoDB()
 )()

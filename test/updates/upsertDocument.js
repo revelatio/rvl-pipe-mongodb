@@ -13,7 +13,7 @@ test.serial('upsert one document with static data', t => {
 
   return each(
     connectMongoDB('fakeUrl', 'fakeDB'),
-    upsertDocument('contacts', always({ _id: uid, name, email }))
+    upsertDocument('contacts', always({ _id: uid }), always({ _id: uid, name, email }))
   )()
     .then(() => {
       t.is(collectionStub.args[0][0], 'contacts')
@@ -34,6 +34,9 @@ test.serial('upsert one document with dynamic data', t => {
     connectMongoDB('fakeUrl', 'fakeDB'),
     upsertDocument(
       'contacts',
+      props({
+        _id: prop('contactId')
+      }),
       props({
         _id: prop('contactId'),
         name: prop('desiredName'),
