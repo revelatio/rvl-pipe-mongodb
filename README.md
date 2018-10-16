@@ -106,6 +106,27 @@ return ensure(
 )({ owner: '209889833' })
 ```
 
+- `runQueryPage`: Similar to `runQuery` with added support for `skip` and `limit` via functions.
+
+
+```javascript
+return ensure(
+    each(
+        connectMongoDB(process.env.MONGO_URL, process.env.MONGO_DB),
+        runQueryPage(
+            'projects',
+            props({ owner: prop('owner') }),
+            'ownerProjects',
+            always(0), // Skip
+            always(10) // Limit
+        ),
+        should(prop('ownerProjects'), 'ProjectsNotFound')
+    ),
+    closeMongoDB()
+)({ owner: '209889833' })
+```
+
+
 - `runQueryExists`: Exactly as `runQueryOne` but will return **true** | **false**
 if the document exists on the DB
 
@@ -119,6 +140,26 @@ return ensure(
     closeMongoDB()
 )()
 ```
+
+- `runQueryCount`: Exactly as `runQueryExists` but will return how many documents match on the DB
+
+```javascript
+return ensure(
+    each(
+        connectMongoDB(process.env.MONGO_URL, process.env.MONGO_DB),
+        runQueryCount('contacts', always({ _id: uidToFind }), 'contactCount'),
+        should(
+            equal(
+                prop('contactCount'),
+                always(2)
+            ),
+            'ContactCountDiffersFromTwo'
+        )
+    ),
+    closeMongoDB()
+)()
+```
+
 
 ## Creating and Updating documents
 

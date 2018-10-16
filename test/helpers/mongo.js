@@ -27,7 +27,9 @@ module.exports.fakeMongo = params => {
   const findOneStub = sinon.stub().returns(Promise.resolve(contact))
   const findStub = sinon.stub().returns({
     count: () => Promise.resolve(count),
-    toArray: () => Promise.resolve(toArray)
+    toArray: () => Promise.resolve(toArray),
+    skip: n => findStub(n),
+    limit: n => findStub(n)
   })
   const collectionStub = sinon.stub().returns({
     findOne: findOneStub,
