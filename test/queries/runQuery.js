@@ -3,11 +3,13 @@ const { each, prop, props, always } = require('rvl-pipe')
 const { connectMongoDB, runQuery } = require('../../index')
 const { fakeMongo, fakeCollections } = require('../helpers/mongo')
 
+const connect = connectMongoDB(always('fakeUrl'), always('fakeDB'), always({}))
+
 test.serial('queries one document with static filter', t => {
   const { restore, collectionStub, findStub } = fakeMongo({ toArray: fakeCollections.contacts })
 
   return each(
-    connectMongoDB('fakeUrl', 'fakeDB'),
+    connect,
     runQuery('contacts', always({}), 'contactList')
   )()
     .then(context => {
@@ -23,7 +25,7 @@ test.serial('queries one document with dynamic filter', t => {
   const { restore, collectionStub, findStub } = fakeMongo({ toArray: fakeCollections.contacts })
 
   return each(
-    connectMongoDB('fakeUrl', 'fakeDB'),
+    connect,
     runQuery('contacts', props({ group: prop('selectedGroup') }), 'contactList')
   )({ selectedGroup: 'teamA' })
     .then(context => {

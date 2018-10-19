@@ -1,13 +1,15 @@
 const test = require('ava')
-const { each } = require('rvl-pipe')
+const { each, always } = require('rvl-pipe')
 const { connectMongoDB, closeMongoDB } = require('../../index')
 const { fakeMongo } = require('../helpers/mongo')
+
+const connect = connectMongoDB(always('fakeUrl'), always('fakeDB'), always({}))
 
 test.serial('connects to DB', t => {
   const { restore, closeStub } = fakeMongo()
 
   return each(
-    connectMongoDB('fakeUrl', 'fakeDB'),
+    connect,
     ctx => {
       t.truthy(ctx.mongodb)
       return ctx

@@ -3,11 +3,13 @@ const { each, prop, props, always } = require('rvl-pipe')
 const { connectMongoDB, runQueryExists } = require('../../index')
 const { fakeMongo, fakeCollections } = require('../helpers/mongo')
 
+const connect = connectMongoDB(always('fakeUrl'), always('fakeDB'), always({}))
+
 test.serial('checks if document exists with static filter', t => {
   const { restore, collectionStub, findStub } = fakeMongo()
 
   return each(
-    connectMongoDB('fakeUrl', 'fakeDB'),
+    connect,
     runQueryExists('contacts', always({ _id: fakeCollections.contact._id }), 'hasContact')
   )()
     .then(context => {
@@ -23,7 +25,7 @@ test.serial('checks if document exists with dynamic filter', t => {
   const { restore, collectionStub, findStub } = fakeMongo()
 
   return each(
-    connectMongoDB('fakeUrl', 'fakeDB'),
+    connect,
     runQueryExists('contacts', props({ _id: prop('contactId') }), 'hasContact')
   )({ contactId: fakeCollections.contact._id })
 
@@ -40,7 +42,7 @@ test.serial('document does not exists with dynamic filter', t => {
   const { restore, collectionStub, findStub } = fakeMongo({ count: 0 })
 
   return each(
-    connectMongoDB('fakeUrl', 'fakeDB'),
+    connect,
     runQueryExists('contacts', props({ _id: prop('contactId') }), 'hasContact')
   )({ contactId: fakeCollections.contact._id })
     .then(context => {

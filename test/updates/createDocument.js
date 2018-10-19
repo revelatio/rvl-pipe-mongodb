@@ -5,6 +5,8 @@ const { fakeMongo } = require('../helpers/mongo')
 const faker = require('faker')
 const cuid = require('cuid')
 
+const connect = connectMongoDB(always('fakeUrl'), always('fakeDB'), always({}))
+
 test.serial('creates one document with static data', t => {
   const { restore, collectionStub, insertOneStub } = fakeMongo()
   const uid = cuid()
@@ -12,7 +14,7 @@ test.serial('creates one document with static data', t => {
   const email = faker.internet.email()
 
   return each(
-    connectMongoDB('fakeUrl', 'fakeDB'),
+    connect,
     createDocument('contacts', always({ _id: uid, name, email }), 'newContact')
   )()
     .then(context => {
@@ -31,7 +33,7 @@ test.serial('creates one document with dynamic data', t => {
   const email = faker.internet.email()
 
   return each(
-    connectMongoDB('fakeUrl', 'fakeDB'),
+    connect,
     createDocument('contacts', props({ _id: uid, name: prop('contact.name'), email: prop('contact.email') }), 'newContact')
   )({ contact: { name, email } })
     .then(context => {

@@ -28,13 +28,13 @@ For Mongodb the set of functions are of 3 types: connection, query and updates.
 
 ## Connection
 
-- `connectMongoDB`: Creates a connection step, You need to pass url and dbName.
+- `connectMongoDB`: Creates a connection step, You need to pass url, dbName and connection options as functions.
 Only runs once. So you can use the same step several times without actually
 attempting the connection process. It will add a `mongodb` property to the context.
 
 ```javascript
 return each(
-    connectMongoDB(process.env.MONGO_URL, process.env.MONGO_DB),
+    connectMongoDB(always(process.env.MONGO_URL), always(process.env.MONGO_DB), always({...})),
     should(prop('mongodb'), 'NoMongoDBConnection')
 )()
 ```
@@ -43,7 +43,7 @@ return each(
 
 ```javascript
 return each(
-    connectMongoDB(process.env.MONGO_URL, process.env.MONGO_DB),
+    connectMongoDB(always(process.env.MONGO_URL), always(process.env.MONGO_DB), always({...})),
     // Do some DB operations
     closeMongoDB()
 )()
@@ -54,7 +54,7 @@ To handle connection errors is best to wrap your functions with the `ensure` fun
 ```javascript
 return ensure(
     each(
-        connectMongoDB(process.env.MONGO_URL, process.env.MONGO_DB),
+        connectMongoDB(always(process.env.MONGO_URL), always(process.env.MONGO_DB), always({...})),
         // Do some DB operations
         // ...
     ),
@@ -70,7 +70,7 @@ filter and property name to store value.
 ```javascript
 return ensure(
     each(
-        connectMongoDB(process.env.MONGO_URL, process.env.MONGO_DB),
+        connectMongoDB(always(process.env.MONGO_URL), always(process.env.MONGO_DB), always({...})),
         runQueryOne('contacts', always({ _id: uidToFind }), 'foundContact'),
         should(prop('foundContact'), 'ContactNotFound')
     ),
@@ -83,7 +83,7 @@ You can also use dynamic data for the filter
 ```javascript
 return ensure(
     each(
-        connectMongoDB(process.env.MONGO_URL, process.env.MONGO_DB),
+        connectMongoDB(always(process.env.MONGO_URL), always(process.env.MONGO_DB), always({...})),
         runQueryOne('contacts', props({ _id: prop('contactId') }), 'foundContact'),
         should(prop('foundContact'), 'ContactNotFound')
     ),
@@ -98,7 +98,7 @@ performant in terms of memory consumption since it uses the `toArray()` on the r
 ```javascript
 return ensure(
     each(
-        connectMongoDB(process.env.MONGO_URL, process.env.MONGO_DB),
+        connectMongoDB(always(process.env.MONGO_URL), always(process.env.MONGO_DB), always({...})),
         runQuery('projects', props({ owner: prop('owner') }), 'ownerProjects'),
         should(prop('ownerProjects'), 'ProjectsNotFound')
     ),
@@ -112,7 +112,7 @@ return ensure(
 ```javascript
 return ensure(
     each(
-        connectMongoDB(process.env.MONGO_URL, process.env.MONGO_DB),
+        connectMongoDB(always(process.env.MONGO_URL), always(process.env.MONGO_DB), always({...})),
         runQueryPage(
             'projects',
             props({ owner: prop('owner') }),
@@ -133,7 +133,7 @@ if the document exists on the DB
 ```javascript
 return ensure(
     each(
-        connectMongoDB(process.env.MONGO_URL, process.env.MONGO_DB),
+        connectMongoDB(always(process.env.MONGO_URL), always(process.env.MONGO_DB), always({...})),
         runQueryExists('contacts', always({ _id: uidToFind }), 'foundContact'),
         should(prop('foundContact'), 'ContactNotFound')
     ),
@@ -146,7 +146,7 @@ return ensure(
 ```javascript
 return ensure(
     each(
-        connectMongoDB(process.env.MONGO_URL, process.env.MONGO_DB),
+        connectMongoDB(always(process.env.MONGO_URL), always(process.env.MONGO_DB), always({...})),
         runQueryCount('contacts', always({ _id: uidToFind }), 'contactCount'),
         should(
             equal(
@@ -168,7 +168,7 @@ return ensure(
 ```javascript
 return ensure(
     each(
-        connectMongoDB(process.env.MONGO_URL, process.env.MONGO_DB),
+        connectMongoDB(always(process.env.MONGO_URL), always(process.env.MONGO_DB), always({...})),
         createDocument('contacts', always({ _id: cuid(), name: 'John', last: 'Doe' }), 'newContact'),
         should(prop('newContact'), 'ContactNotCreated')
     ),
@@ -182,7 +182,7 @@ find the document we want to change and the mutation object.
 ```javascript
 return ensure(
     each(
-        connectMongoDB(process.env.MONGO_URL, process.env.MONGO_DB),
+        connectMongoDB(always(process.env.MONGO_URL), always(process.env.MONGO_DB), always({...})),
         updateDocumentOne('contacts', always({ _id: uidToChange }), always({ $set: { name: 'Mary' } }))
     ),
     closeMongoDB()
@@ -196,7 +196,7 @@ exists and update that document, if not, then creates a new one.
 ```javascript
 return ensure(
     each(
-        connectMongoDB(process.env.MONGO_URL, process.env.MONGO_DB),
+        connectMongoDB(always(process.env.MONGO_URL), always(process.env.MONGO_DB), always({...})),
         upsertDocument('contacts', always({ _id: uidToFind }), always({ _id: uidToFind, name, last }), 'contact')
     ),
     closeMongoDB()

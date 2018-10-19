@@ -3,11 +3,13 @@ const { each, prop, props, always } = require('rvl-pipe')
 const { connectMongoDB, runQueryCount } = require('../../index')
 const { fakeMongo, fakeCollections } = require('../helpers/mongo')
 
+const connect = connectMongoDB(always('fakeUrl'), always('fakeDB'), always({}))
+
 test.serial('returns count for filter', t => {
   const { restore, collectionStub, findStub } = fakeMongo()
 
   return each(
-    connectMongoDB('fakeUrl', 'fakeDB'),
+    connect,
     runQueryCount('contacts', always({ _id: fakeCollections.contact._id }), 'countContact')
   )()
     .then(context => {

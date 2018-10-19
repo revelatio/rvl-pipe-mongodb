@@ -1,13 +1,15 @@
 const test = require('ava')
-const { each, should, prop } = require('rvl-pipe')
+const { each, should, prop, always } = require('rvl-pipe')
 const { connectMongoDB } = require('../../index')
 const { fakeMongo } = require('../helpers/mongo')
+
+const connect = connectMongoDB(always('fakeUrl'), always('fakeDB'), always({}))
 
 test.serial('connects to DB', t => {
   const { connectStub, dbStub, restore } = fakeMongo()
 
   return each(
-    connectMongoDB('fakeUrl', 'fakeDB'),
+    connect,
     context => {
       t.truthy(context.mongodb)
       t.is(connectStub.args[0][0], 'fakeUrl')
@@ -22,9 +24,9 @@ test.serial('should not attempt connect if there is already a mongodb object on 
   const { connectStub, dbStub, restore } = fakeMongo()
 
   return each(
-    connectMongoDB('fakeUrl', 'fakeDB'),
+    connect,
     should(prop('mongodb')),
-    connectMongoDB('fakeUrl', 'fakeDB'),
+    connect,
     context => {
       t.truthy(context.mongodb)
       t.is(connectStub.callCount, 1)
@@ -38,7 +40,7 @@ test.serial('should not attempt connect if there is already a mongodb object on 
 test.serial('connects to DB using empty object', t => {
   const { connectStub, dbStub, restore } = fakeMongo()
 
-  return connectMongoDB('fakeUrl', 'fakeDB')()
+  return connect()
     .then(context => {
       t.truthy(context.mongodb)
       t.is(connectStub.args[0][0], 'fakeUrl')

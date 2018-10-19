@@ -3,11 +3,13 @@ const { each, prop, props, always } = require('rvl-pipe')
 const { connectMongoDB, runQueryPage } = require('../../index')
 const { fakeMongo, fakeCollections } = require('../helpers/mongo')
 
+const connect = connectMongoDB(always('fakeUrl'), always('fakeDB'), always({}))
+
 test.serial('queries one document with static filter', t => {
   const { restore, collectionStub, findStub } = fakeMongo({ toArray: fakeCollections.contacts })
 
   return each(
-    connectMongoDB('fakeUrl', 'fakeDB'),
+    connect,
     runQueryPage('contacts', always({}), 'contactList', always(2), always(3))
   )()
     .then(context => {
