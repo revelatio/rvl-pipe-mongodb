@@ -1,5 +1,5 @@
 const test = require('ava')
-const { each, prop, props, always } = require('rvl-pipe')
+const { each, always } = require('rvl-pipe')
 const { connectMongoDB, runQueryPage } = require('../../index')
 const { fakeMongo, fakeCollections } = require('../helpers/mongo')
 
@@ -22,4 +22,3 @@ test.serial('queries one document with static filter', t => {
       restore()
     })
 })
-

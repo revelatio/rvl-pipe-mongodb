@@ -1,5 +1,5 @@
 const test = require('ava')
-const { each, prop, props, always } = require('rvl-pipe')
+const { each, always } = require('rvl-pipe')
 const { connectMongoDB, runQueryCount } = require('../../index')
 const { fakeMongo, fakeCollections } = require('../helpers/mongo')
 
