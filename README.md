@@ -28,7 +28,9 @@ For Mongodb the set of functions are of 3 types: connection, query and updates.
 
 ## Connection
 
-- `connectMongoDB`: Creates a connection step, You need to pass url, dbName and connection options as functions.
+- `connectMongoDB(urlFn, dbNameFn, optionsFn)`: Creates a connection step,
+You need to pass url, dbName and connection options as functions that pull the
+right information from the context or simply use a constant function (like always)
 Only runs once. So you can use the same step several times without actually
 attempting the connection process. It will add a `mongodb` property to the context.
 
@@ -39,7 +41,7 @@ return each(
 )()
 ```
 
-- `closeMongoDB`: Closes the DB connection that exists on the context.
+- `closeMongoDB()`: Closes the DB connection that exists on the context.
 
 ```javascript
 return each(
@@ -64,8 +66,7 @@ return ensure(
 
 ## Queries
 
-- `runQueryOne`: Performs a simple `findOne` query. We need to especify, collection,
-filter and property name to store value.
+- `runQueryOne(collection, filterFn, propName, projectionFn?)`: Performs a simple `findOne` query. We need to especify, collection, filter, property name to store value and projection to define the props we want to retrieve. the `projectioFn` params in not mandatory, if not provided all props will be retrieved.
 
 ```javascript
 return ensure(
@@ -73,10 +74,12 @@ return ensure(
         connectMongoDB(always(process.env.MONGO_URL), always(process.env.MONGO_DB), always({...})),
         runQueryOne('contacts', always({ _id: uidToFind }), 'foundContact'),
         should(prop('foundContact'), 'ContactNotFound')
+        runQueryOne('users', prop({ id: prop('foundContant.id') }), 'user', always({ email: 1 })) // Only retrieves email
     ),
     closeMongoDB()
 )()
 ```
+
 
 You can also use dynamic data for the filter
 
@@ -91,7 +94,7 @@ return ensure(
 )({ contactId: '209889833' })
 ```
 
-- `runQuery`: Similar to `runQueryOne` but returning all resulting documents. (This function is not designed to be
+- `runQuery(collection, filterFn, propName, projectionFn?)`: Similar to `runQueryOne` but returning all resulting documents. (This function is not designed to be
 performant in terms of memory consumption since it uses the `toArray()` on the resulting `find` cursor.
 
 
@@ -106,7 +109,7 @@ return ensure(
 )({ owner: '209889833' })
 ```
 
-- `runQueryPage`: Similar to `runQuery` with added support for `skip` and `limit` via functions.
+- `runQueryPage(collection, filterFn, propName, skipFn, limitFn, projectionFn?)`: Similar to `runQuery` with added support for `skip` and `limit` via functions.
 
 
 ```javascript
@@ -127,7 +130,7 @@ return ensure(
 ```
 
 
-- `runQueryExists`: Exactly as `runQueryOne` but will return **true** | **false**
+- `runQueryExists(collection, filterFn, propName)`: Exactly as `runQueryOne` but will return **true** | **false**
 if the document exists on the DB
 
 ```javascript
@@ -141,7 +144,7 @@ return ensure(
 )()
 ```
 
-- `runQueryCount`: Exactly as `runQueryExists` but will return how many documents match on the DB
+- `runQueryCount(collection, filterFn, propName)`: Exactly as `runQueryExists` but will return how many documents match on the DB
 
 ```javascript
 return ensure(
@@ -163,7 +166,7 @@ return ensure(
 
 ## Creating and Updating documents
 
-- `createDocument`: Creates a simple document passing the collection and the data for it.
+- `createDocument(collection, dataFn, propName)`: Creates a simple document passing the collection and the data for it.
 
 ```javascript
 return ensure(
@@ -176,8 +179,8 @@ return ensure(
 )()
 ```
 
-- `updateDocumentOne`: Updates one document passing the collection, the filter to
-find the document we want to change and the mutation object.
+- `updateDocumentOne(collection, filterFn, modificationFn)`: Updates one document passing the collection, the filter to
+find the document we want to change and the modification object.
 
 ```javascript
 return ensure(
@@ -189,8 +192,8 @@ return ensure(
 )()
 ```
 
-- `upsertDocument`: This function will create a step to upsert a document based on a filter function.
-You can create a new document, `upsertDocument` will try to find if that documento already
+- `upsertDocument(collection, filterFn, dataFn, propName)`: This function will create a step to upsert a document based on a filter function.
+You can create a new document, `upsertDocument` will try to find if that document already
 exists and update that document, if not, then creates a new one.
 
 ```javascript
