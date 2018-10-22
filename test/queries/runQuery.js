@@ -21,19 +21,19 @@ test.serial('queries one document with static filter', t => {
     })
 })
 
-test.serial('queries one document with projection', t => {
+test.serial('queries one document with options', t => {
   const { restore, collectionStub, findStub } = fakeMongo({ toArray: fakeCollections.contacts })
 
   return each(
     connect,
-    runQuery('contacts', always({}), 'contactList', always({ name: 1, email: 1 }))
+    runQuery('contacts', always({}), 'contactList', always({ projection: { name: 1, email: 1 } }))
   )()
     .then(context => {
       t.truthy(context.contactList)
       t.deepEqual(context.contactList, fakeCollections.contacts)
       t.is(collectionStub.args[0][0], 'contacts')
       t.deepEqual(findStub.args[0][0], {})
-      t.deepEqual(findStub.args[0][1], { name: 1, email: 1 })
+      t.deepEqual(findStub.args[0][1], { projection: { name: 1, email: 1 } })
       restore()
     })
 })

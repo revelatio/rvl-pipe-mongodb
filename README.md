@@ -66,7 +66,7 @@ return ensure(
 
 ## Queries
 
-- `runQueryOne(collection, filterFn, propName, projectionFn?)`: Performs a simple `findOne` query. We need to especify, collection, filter, property name to store value and projection to define the props we want to retrieve. the `projectioFn` params in not mandatory, if not provided all props will be retrieved.
+- `runQueryOne(collection, filterFn, propName, options?)`: Performs a simple `findOne` query. We need to especify, collection, filter, property name to store value and options to define the props we want to retrieve. the `optionsFn` params in not mandatory.
 
 ```javascript
 return ensure(
@@ -74,7 +74,7 @@ return ensure(
         connectMongoDB(always(process.env.MONGO_URL), always(process.env.MONGO_DB), always({...})),
         runQueryOne('contacts', always({ _id: uidToFind }), 'foundContact'),
         should(prop('foundContact'), 'ContactNotFound')
-        runQueryOne('users', prop({ id: prop('foundContant.id') }), 'user', always({ email: 1 })) // Only retrieves email
+        runQueryOne('users', prop({ id: prop('foundContant.id') }), 'user', always({ projection: { email: 1 } })) // Only retrieves email
     ),
     closeMongoDB()
 )()
@@ -94,7 +94,7 @@ return ensure(
 )({ contactId: '209889833' })
 ```
 
-- `runQuery(collection, filterFn, propName, projectionFn?)`: Similar to `runQueryOne` but returning all resulting documents. (This function is not designed to be
+- `runQuery(collection, filterFn, propName, options?)`: Similar to `runQueryOne` but returning all resulting documents. (This function is not designed to be
 performant in terms of memory consumption since it uses the `toArray()` on the resulting `find` cursor.
 
 
@@ -103,26 +103,6 @@ return ensure(
     each(
         connectMongoDB(always(process.env.MONGO_URL), always(process.env.MONGO_DB), always({...})),
         runQuery('projects', props({ owner: prop('owner') }), 'ownerProjects'),
-        should(prop('ownerProjects'), 'ProjectsNotFound')
-    ),
-    closeMongoDB()
-)({ owner: '209889833' })
-```
-
-- `runQueryPage(collection, filterFn, propName, skipFn, limitFn, projectionFn?)`: Similar to `runQuery` with added support for `skip` and `limit` via functions.
-
-
-```javascript
-return ensure(
-    each(
-        connectMongoDB(always(process.env.MONGO_URL), always(process.env.MONGO_DB), always({...})),
-        runQueryPage(
-            'projects',
-            props({ owner: prop('owner') }),
-            'ownerProjects',
-            always(0), // Skip
-            always(10) // Limit
-        ),
         should(prop('ownerProjects'), 'ProjectsNotFound')
     ),
     closeMongoDB()
