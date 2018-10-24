@@ -28,12 +28,15 @@ module.exports.fakeMongo = params => {
   const findStub = sinon.stub().returns({
     count: () => Promise.resolve(count),
     toArray: () => Promise.resolve(toArray),
-    skip: n => findStub(n),
-    limit: n => findStub(n)
+  })
+  const aggregateStub = sinon.stub().returns({
+    count: () => Promise.resolve(count),
+    toArray: () => Promise.resolve(toArray),
   })
   const collectionStub = sinon.stub().returns({
     findOne: findOneStub,
     find: findStub,
+    aggregate: aggregateStub,
     insertOne: insertOneStub,
     updateOne: updateOneStub,
     replaceOne: replaceOneStub
@@ -62,6 +65,7 @@ module.exports.fakeMongo = params => {
     findStub,
     insertOneStub,
     updateOneStub,
-    replaceOneStub
+    replaceOneStub,
+    aggregateStub
   }
 }

@@ -109,6 +109,27 @@ return ensure(
 )({ owner: '209889833' })
 ```
 
+- `runQueryAggregation(collection, pipelineFns, propName, options?)`: Similar to `runQuery` but, using the mongodb `aggregate` function and using the `pipelineFns` array of functions to define the aggregation pipeline. Also, returning all resulting documents. (This function is not designed to be
+performant in terms of memory consumption since it uses the `toArray()` on the resulting `aggregate` cursor.
+
+
+```javascript
+return ensure(
+    each(
+        connectMongoDB(always(process.env.MONGO_URL), always(process.env.MONGO_DB), always({...})),
+        runQueryAggregation(
+            'projects',
+            [
+                props({ $match: { owner: prop('owner') } })
+            ],
+            'ownerProjects'
+        ),
+        should(prop('ownerProjects'), 'ProjectsNotFound')
+    ),
+    closeMongoDB()
+)({ owner: '209889833' })
+```
+
 
 - `runQueryExists(collection, filterFn, propName)`: Exactly as `runQueryOne` but will return **true** | **false**
 if the document exists on the DB
