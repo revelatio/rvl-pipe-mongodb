@@ -1,7 +1,7 @@
-const MongoClient = require('mongodb')
-const sinon = require('sinon')
-const cuid = require('cuid')
-const faker = require('faker')
+import MongoClient from 'mongodb'
+import sinon from 'sinon'
+import cuid from 'cuid'
+import faker from 'faker'
 
 const contact = {
   _id: cuid(),
@@ -16,9 +16,9 @@ const contacts = [
   { _id: cuid(), name: faker.name.findName(), email: faker.internet.email() }
 ]
 
-module.exports.fakeCollections = { contact, contacts }
+export const fakeCollections = { contact, contacts }
 
-module.exports.fakeMongo = params => {
+export const fakeMongo = (params?: any) => {
   const { count = 1, toArray = [] } = params || {}
 
   const replaceOneStub = sinon.stub().returns(Promise.resolve())
@@ -27,11 +27,11 @@ module.exports.fakeMongo = params => {
   const findOneStub = sinon.stub().returns(Promise.resolve(contact))
   const findStub = sinon.stub().returns({
     count: () => Promise.resolve(count),
-    toArray: () => Promise.resolve(toArray),
+    toArray: () => Promise.resolve(toArray)
   })
   const aggregateStub = sinon.stub().returns({
     count: () => Promise.resolve(count),
-    toArray: () => Promise.resolve(toArray),
+    toArray: () => Promise.resolve(toArray)
   })
   const collectionStub = sinon.stub().returns({
     findOne: findOneStub,
@@ -46,20 +46,37 @@ module.exports.fakeMongo = params => {
   })
   const closeStub = sinon.stub()
 
-  const connectStub = sinon.stub(MongoClient, 'connect').returns(
-    Promise.resolve({
-      db: dbStub,
-      close: closeStub
-    })
-  )
+  const connectStubResult: any = Promise.resolve({
+    db: dbStub,
+    close: closeStub
+  })
 
-  const restore = () => connectStub.restore()
+  const connectStub = sinon
+    .stub(MongoClient, 'connect')
+    .returns(connectStubResult)
+
+  const restore = () => {
+    connectStub.resetHistory()
+    closeStub.resetHistory()
+    dbStub.resetHistory()
+    findStub.resetHistory()
+    aggregateStub.resetHistory()
+    findOneStub.resetHistory()
+    insertOneStub.resetHistory()
+    updateOneStub.resetHistory()
+    replaceOneStub.resetHistory()
+  }
+
+  const finalRestore = () => {
+    connectStub.restore()
+  }
 
   return {
     dbStub,
     closeStub,
     connectStub,
     restore,
+    finalRestore,
     findOneStub,
     collectionStub,
     findStub,

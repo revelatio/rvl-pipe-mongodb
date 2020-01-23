@@ -24,15 +24,22 @@ const myAsycTask = (taskParams) => context => {
 }
 ```
 
+## Version 2.0.0 the one with Typings (in TypeScript)
+
+This version is the first completely ported to TypeScript so
+the build process exports the type definitions. 
+
+## Function types
+
 For Mongodb the set of functions are of 3 types: connection, query and updates.
 
 ## Connection
 
 - `connectMongoDB(urlFn, dbNameFn, optionsFn)`: Creates a connection step,
-You need to pass url, dbName and connection options as functions that pull the
-right information from the context or simply use a constant function (like always)
-Only runs once. So you can use the same step several times without actually
-attempting the connection process. It will add a `mongodb` property to the context.
+  You need to pass url, dbName and connection options as functions that pull the
+  right information from the context or simply use a constant function (like always)
+  Only runs once. So you can use the same step several times without actually
+  attempting the connection process. It will add a `mongodb` property to the context.
 
 ```javascript
 return each(
@@ -80,7 +87,6 @@ return ensure(
 )()
 ```
 
-
 You can also use dynamic data for the filter
 
 ```javascript
@@ -95,8 +101,7 @@ return ensure(
 ```
 
 - `runQuery(collection, filterFn, propName, options?)`: Similar to `runQueryOne` but returning all resulting documents. (This function is not designed to be
-performant in terms of memory consumption since it uses the `toArray()` on the resulting `find` cursor.
-
+  performant in terms of memory consumption since it uses the `toArray()` on the resulting `find` cursor.
 
 ```javascript
 return ensure(
@@ -110,8 +115,7 @@ return ensure(
 ```
 
 - `runQueryAggregation(collection, pipelineFns, propName, options?)`: Similar to `runQuery` but, using the mongodb `aggregate` function and using the `pipelineFns` array of functions to define the aggregation pipeline. Also, returning all resulting documents. (This function is not designed to be
-performant in terms of memory consumption since it uses the `toArray()` on the resulting `aggregate` cursor.
-
+  performant in terms of memory consumption since it uses the `toArray()` on the resulting `aggregate` cursor.
 
 ```javascript
 return ensure(
@@ -130,9 +134,8 @@ return ensure(
 )({ owner: '209889833' })
 ```
 
-
 - `runQueryExists(collection, filterFn, propName)`: Exactly as `runQueryOne` but will return **true** | **false**
-if the document exists on the DB
+  if the document exists on the DB
 
 ```javascript
 return ensure(
@@ -164,7 +167,6 @@ return ensure(
 )()
 ```
 
-
 ## Creating and Updating documents
 
 - `createDocument(collection, dataFn, propName)`: Creates a simple document passing the collection and the data for it.
@@ -181,7 +183,7 @@ return ensure(
 ```
 
 - `updateDocumentOne(collection, filterFn, modificationFn)`: Updates one document passing the collection, the filter to
-find the document we want to change and the modification object.
+  find the document we want to change and the modification object.
 
 ```javascript
 return ensure(
@@ -194,8 +196,8 @@ return ensure(
 ```
 
 - `upsertDocument(collection, filterFn, dataFn, propName)`: This function will create a step to upsert a document based on a filter function.
-You can create a new document, `upsertDocument` will try to find if that document already
-exists and update that document, if not, then creates a new one.
+  You can create a new document, `upsertDocument` will try to find if that document already
+  exists and update that document, if not, then creates a new one.
 
 ```javascript
 return ensure(
