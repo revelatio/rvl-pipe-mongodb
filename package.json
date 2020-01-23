@@ -1,11 +1,15 @@
 {
   "name": "rvl-pipe-mongodb",
-  "version": "1.5.0",
+  "version": "2.0.0",
   "description": "rvl-pipe style wrappers for mongodb",
-  "main": "index.js",
+  "main": "build/index.js",
+  "module": "build/index.es.js",
+  "jsnext:main": "build/index.es.js",
   "scripts": {
-    "test": "nyc ava --verbose",
+    "build": "rollup -c",
+    "test": "jest --coverage",
     "lint": "standard",
+    "format": "prettier-standard --format",
     "report": "nyc report --reporter=html"
   },
   "keywords": [
@@ -14,25 +18,60 @@
     "async",
     "mongodb"
   ],
+  "files": [
+    "build"
+  ],
   "repository": "https://github.com/revelatio/rvl-pipe-mongodb",
   "author": "Ernesto Freyre",
   "license": "MIT",
-  "dependencies": {
-    "mongodb": "^3.3.2",
-    "rvl-pipe": "^1.6.0"
+  "peerDependencies": {
+    "mongodb": "^3.5.2",
+    "rvl-pipe": "^2.0.0"
   },
   "devDependencies": {
-    "ava": "^2.4.0",
+    "@types/jest": "^24.9.1",
+    "@types/mongodb": "^3.3.14",
     "coveralls": "^3.0.6",
     "cuid": "^2.1.6",
     "faker": "^4.1.0",
+    "jest": "^25.1.0",
+    "mongodb": "^3.3.2",
     "nyc": "^14.1.1",
+    "prettier-standard": "^16.1.0",
+    "rollup": "^1.29.1",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-peer-deps-external": "^2.2.0",
+    "rollup-plugin-typescript2": "^0.25.3",
+    "rvl-pipe": "^2.0.0",
     "sinon": "^7.5.0",
-    "standard": "^14.3.1"
+    "standard": "^14.3.1",
+    "ts-jest": "^25.0.0",
+    "typescript": "^3.7.5"
   },
-  "ava": {
-    "helpers": [
-      "**/helpers/**/*"
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/__tests__/**/*.spec.ts"
     ]
+  },
+  "standard": {
+    "ignore": [
+      "node_modules/",
+      "build/"
+    ],
+    "globals": [
+      "test",
+      "expect",
+      "describe",
+      "it",
+      "afterEach",
+      "afterAll"
+    ]
+  },
+  "dependencies": {
+    "@types/faker": "^4.1.9",
+    "@types/sinon": "^7.5.1"
   }
 }
